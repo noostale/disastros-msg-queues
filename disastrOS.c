@@ -11,6 +11,7 @@
 #include "disastrOS_timer.h"
 #include "disastrOS_resource.h"
 #include "disastrOS_descriptor.h"
+#include "disastrOS_message_queue.h"
 
 FILE* log_file=NULL;
 PCB* init_pcb;
@@ -177,6 +178,14 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   syscall_vector[DSOS_CALL_SHUTDOWN]      = internal_shutdown;
   syscall_numarg[DSOS_CALL_SHUTDOWN]      = 0;
 
+  //Aggiungo in syscall_vector le due nuove system call assieme al numero di argomenti
+
+  syscall_vector[DSOS_CALL_MQ_WTRITE]      = internal_MessageQueue_write;
+  syscall_numarg[DSOS_CALL_MQ_WTRITE]      = 0;
+
+  syscall_vector[DSOS_CALL_MQ_READ]      = internal_MessageQueue_read;
+  syscall_numarg[DSOS_CALL_MQ_READ]      = 0;
+
   // setup the scheduling lists
   running=0;
   List_init(&ready_list);
@@ -284,6 +293,16 @@ int disastrOS_closeResource(int fd) {
 
 int disastrOS_destroyResource(int resource_id) {
   return disastrOS_syscall(DSOS_CALL_DESTROY_RESOURCE, resource_id);
+}
+
+//Imposto le 2 nuove system call di lettura/scrittura dei messaggi
+
+int disastrOS_readMessageQueue(){
+
+}
+
+int disastrOS_writeMessageQueue(){
+
 }
 
 
