@@ -10,6 +10,7 @@ HEADERS=disastrOS.h\
 	disastrOS_resource.h\
 	disastrOS_syscalls.h\
 	disastrOS_timer.h\
+	disastrOS_message_queue.h\
 	linked_list.h\
 	pool_allocator.h\
 
@@ -30,7 +31,8 @@ OBJS=pool_allocator.o\
      disastrOS_sleep.o\
      disastrOS_open_resource.o\
      disastrOS_close_resource.o\
-     disastrOS_destroy_resource.o
+     disastrOS_destroy_resource.o\
+	 disastrOS_message_queue.o\
 
 LIBS=libdisastrOS.a
 
