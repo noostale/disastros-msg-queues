@@ -31,7 +31,7 @@ Message* Message_alloc(int sender_pid, char* message, int length){
   
   //Riempi i campi dello struct Message
   out_mex -> sender = sender_pid;
-  for (int i=0, i<length, i++) out_mex -> message[i] = message[i];
+  for (int i=0; i<length; i++) out_mex -> message[i] = message[i];
   out_mex -> length = length;
 
   return out_mex;

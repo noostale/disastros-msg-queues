@@ -42,7 +42,7 @@ int MessageQueue_free(MessageQueue* mq) {
   ListItem* aux = mq->messages.first;
 
   while(aux){
-    free_check = Message_free((Message*)message);
+    int free_check = Message_free((Message*)aux);
     if(free_check < 0)
       return -64;
     aux = aux -> next;
@@ -60,7 +60,7 @@ void MQ_print(MessageQueue* mq){
 
   while(aux){
     printf("Messaggio n.%d: %s\n", i, (char*)(((Message*)aux)->message));
-    i++
+    i++;
     aux = aux->next;
   }
 
