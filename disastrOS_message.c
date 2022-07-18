@@ -23,13 +23,14 @@ void Message_init(){
     assert(!result);
 }
 
-Message* Message_alloc(int sender_pid, char* message){
+Message* Message_alloc(int sender_pid, char* message, int length){
   Message* m=(Message*) PoolAllocator_getBlock(&_m_allocator);
   if (!m)
     return 0;
     
   m -> sender = sender_pid;
   m -> message = message;
+  m -> length = length;
   return m;
 }
 

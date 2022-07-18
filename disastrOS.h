@@ -37,8 +37,8 @@ int disastrOS_closeResource(int fd) ;
 int disastrOS_destroyResource(int resource_id);
 
 // Messages queues
-int disastrOS_readMessageQueue();
-int disastrOS_writeMessageQueue();
+int disastrOS_readMessageQueue(int fd, char* read_buffer)
+int disastrOS_writeMessageQueue(int fd, char* write_buffer, int message_length);
 
 // debug function, prints the state of the internal system
 void disastrOS_printStatus();

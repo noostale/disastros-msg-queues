@@ -13,6 +13,7 @@ typedef struct {
   ListItem item; //Estensione di ListItem
   char* message; //Messaggio
   int sender; //PID di chi ha inviato il messaggio
+  int length; //Lunghezza del messaggio
 } Message;
 
 void Message_init();

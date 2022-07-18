@@ -181,10 +181,10 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   //Aggiungo in syscall_vector le due nuove system call assieme al numero di argomenti
 
   syscall_vector[DSOS_CALL_MQ_WTRITE]      = internal_MessageQueue_write;
-  syscall_numarg[DSOS_CALL_MQ_WTRITE]      = 0;
+  syscall_numarg[DSOS_CALL_MQ_WTRITE]      = 3;
 
   syscall_vector[DSOS_CALL_MQ_READ]      = internal_MessageQueue_read;
-  syscall_numarg[DSOS_CALL_MQ_READ]      = 0;
+  syscall_numarg[DSOS_CALL_MQ_READ]      = 2;
 
   // setup the scheduling lists
   running=0;
@@ -297,11 +297,11 @@ int disastrOS_destroyResource(int resource_id) {
 
 //Imposto le 2 nuove system call di lettura/scrittura dei messaggi
 
-int disastrOS_readMessageQueue(){
+int disastrOS_readMessageQueue(int fd, char* read_buffer){
 
 }
 
-int disastrOS_writeMessageQueue(){
+int disastrOS_writeMessageQueue(int fd, char* write_buffer, int message_length){
 
 }
 
