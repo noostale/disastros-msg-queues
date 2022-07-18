@@ -4,6 +4,7 @@
 #define MAX_NUM_RESOURCES 1024
 #define MAX_NUM_RESOURCES_PER_PROCESS 32
 #define MAX_NUM_DESCRIPTORS_PER_PROCESS 32
+#define MAX_NUM_MESSAGES 32 //Usiamo un PoolAllocator, serve sapere a prescindere lo spazio massimo del buffer
 
 #define STACK_SIZE        16384
 // signals
