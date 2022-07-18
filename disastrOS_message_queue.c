@@ -5,6 +5,7 @@
 #include "disastrOS_message_queue.h"
 #include "pool_allocator.h"
 #include "linked_list.h"
+#include "disastrOS_message.h"
 
 
 #define MQ_SIZE sizeof(MessageQueue)
@@ -13,6 +14,7 @@
 
 static char _mq_buffer[MQ_BUFFER_SIZE]; //Buffer che verrà usato
 static PoolAllocator _mq_allocator; //Struttura del pool allocator mq
+
 
 void MessageQueue_init(){
     int result=PoolAllocator_init(&_mq_allocator,
@@ -23,21 +25,50 @@ void MessageQueue_init(){
     assert(!result);
 }
 
+
 MessageQueue* MessageQueue_alloc(){
   MessageQueue* mq=(MessageQueue*) PoolAllocator_getBlock(&_mq_allocator);
-  if (!mq)
-    return 0;
+
+  if (!mq) return 0;
+  
   mq->num_written=0;
   List_init(&mq->messages);
+
   return mq;
 }
 
+
 int MessageQueue_free(MessageQueue* mq) {
-  //COMPLETARE
+  ListItem* aux = mq->messages.first;
+
+  while(aux){
+    free_check = Message_free((Message*)message);
+    if(free_check < 0)
+      return -64;
+    aux = aux -> next;
+  }
+
   return PoolAllocator_releaseBlock(&_mq_allocator, mq);
 }
 
-/** COMPLETARE PER LA FASE DI TEST
+
+void MQ_print(MessageQueue* mq){
+  if(mq == NULL) return;
+
+  ListItem* aux = mq -> messages.first;
+  int i = 0;
+
+  while(aux){
+    printf("Messaggio n.%d: %s\n", i, (char*)(((Message*)aux)->message));
+    i++
+    aux = aux->next;
+  }
+
+  return;
+}
+
+
+/**
 
 Resource* ResourceList_byId(ResourceList* l, int id) {
   ListItem* aux=l->first;
@@ -53,21 +84,6 @@ Resource* ResourceList_byId(ResourceList* l, int id) {
 void Resource_print(Resource* r) {
   printf("id: %d, type:%d, pids:", r->id, r->type);
   DescriptorPtrList_print(&r->descriptors_ptrs);
-}
-
-void ResourceList_print(ListHead* l){
-  ListItem* aux=l->first;
-  printf("{\n");
-  while(aux){
-    Resource* r=(Resource*)aux;
-    printf("\t");
-    Resource_print(r);
-    if(aux->next)
-      printf(",");
-    printf("\n");
-    aux=aux->next;
-  }
-  printf("}\n");
 }
 
 **/

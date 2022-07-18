@@ -24,14 +24,17 @@ void Message_init(){
 }
 
 Message* Message_alloc(int sender_pid, char* message, int length){
-  Message* m=(Message*) PoolAllocator_getBlock(&_m_allocator);
-  if (!m)
-    return 0;
-    
-  m -> sender = sender_pid;
-  m -> message = message;
-  m -> length = length;
-  return m;
+  Message* out_mex = (Message*) PoolAllocator_getBlock(&_m_allocator);
+
+  //Se il pool allocator da errore, esci
+  if (!out_mex) return 0;
+  
+  //Riempi i campi dello struct Message
+  out_mex -> sender = sender_pid;
+  for (int i=0, i<length, i++) out_mex -> message[i] = message[i];
+  out_mex -> length = length;
+
+  return out_mex;
 }
 
 int Message_free(Message* m) {
