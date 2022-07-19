@@ -23,6 +23,7 @@ void MessageQueue_init(){
 				  _mq_buffer,
 				  MQ_BUFFER_SIZE);
     assert(!result);
+    Message_init();
 }
 
 
@@ -38,14 +39,16 @@ Resource* MessageQueue_alloc(){
 }
 
 
-int MessageQueue_free(MessageQueue* mq) {
-  ListItem* aux = mq->messages.first;
+int MessageQueue_free(Resource* r){
+  MessageQueue* mq = (MessageQueue*) r;
 
-  while(aux){
-    int free_check = Message_free((Message*)aux);
-    if(free_check < 0)
-      return -64;
-    aux = aux -> next;
+  ListItem* message = mq->messages.first;
+  int r_dealloc = 0;
+  while(message != NULL){
+    r_dealloc = Message_free((Message*)message);
+    if(r_dealloc < 0)
+      return r_dealloc;
+    message = message -> next;
   }
 
   return PoolAllocator_releaseBlock(&_mq_allocator, mq);

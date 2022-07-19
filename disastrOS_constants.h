@@ -5,8 +5,12 @@
 #define MAX_NUM_RESOURCES_PER_PROCESS 32
 #define MAX_NUM_DESCRIPTORS_PER_PROCESS 32
 #define MAX_NUM_MESSAGES 32 //Usiamo un PoolAllocator, serve sapere a prescindere lo spazio massimo del buffer
+#define MAX_LEN_MESSAGE 256
+
+#define MESSAGE_QUEUE 0 //Per comodità di scrittura nel test
 
 #define STACK_SIZE        16384
+
 // signals
 #define MAX_SIGNALS 32
 #define DSOS_SIGCHLD 0x1
@@ -40,7 +44,7 @@
 #define DSOS_CALL_CLOSE_RESOURCE 8
 #define DSOS_CALL_DESTROY_RESOURCE 9
 #define DSOS_CALL_SHUTDOWN  10
-#define DSOS_CALL_MQ_WTRITE  11
+#define DSOS_CALL_MQ_WRITE  11
 #define DSOS_CALL_MQ_READ 12
 
 //resources

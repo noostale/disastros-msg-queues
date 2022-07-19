@@ -10,19 +10,13 @@
 
 void internal_MessageQueue_write(){
 
-    printf("Prova");
-
     //Estraggo i parametri dalla system call
     int fd = running -> syscall_args[0];
     char* write_buffer = (char*)running -> syscall_args[1];
     int message_length = running -> syscall_args[2];
 
-    printf("Prova");
-
     Descriptor* mq_destination = DescriptorList_byFd(&running -> descriptors, fd);
     MessageQueue* mq = (MessageQueue*) mq_destination -> resource;
-
-    printf("Prova");
 
     //Allochiamo un messaggio 
     Message* message = Message_alloc(running -> pid, write_buffer, message_length);
@@ -32,8 +26,6 @@ void internal_MessageQueue_write(){
         running -> syscall_retvalue = -64;
         return;
     }
-
-    printf("Prova");
 
     //Inseriamo il messaggio nella lista, dopo l'ultimo elemento
     List_insert(&mq->messages, mq->messages.last, (ListItem*)message);

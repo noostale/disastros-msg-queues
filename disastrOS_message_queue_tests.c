@@ -20,23 +20,22 @@ void sleeperFunction(void* args){
 void childFunction(void* args){
   printf("\nSono la childFunction con pid n. %d\n",disastrOS_getpid());
   printf("Farò uno sleep prima di terminare\n");
-
-  disastrOS_printStatus();
   
-  int type=0;  
+  int type=MESSAGE_QUEUE;  
   int mode=DSOS_READ;
-  //Apro la risorsa con id pari al pid del processo (?)
+  //Apro la risorsa con id pari al pid del processo
+
   printf("Sto per aprire una risorsa che come id il mio stesso pid\n");
   int fd = disastrOS_openResource(disastrOS_getpid(),type,mode);
-  printf("Ho aperto una risosrsa che ha fd=%d\n", fd);
+  printf("Ho aperto una risorsa che ha fd=%d\n", fd);
 
-  char mex[5];
-  int res = disastrOS_readMessageQueue(fd, mex);
+  if (fd >= 0){  //Sennò un pid negativo mi manderebbe in seg_fault
 
-
+    char message[5];
+    int len = disastrOS_readMessageQueue(fd, message);
+    printf("Ho letto il messaggio %s di lunghezza %d dal fd:%d\n", message, len, fd);
+  }
   printf("PID: %d, terminating\n", disastrOS_getpid());
-
-  // Ci sono problemi nella terminazione del test, il test non finisce
 
   for (int i=0; i<(disastrOS_getpid()+1); ++i){
     printf("PID: %d, iterate %d\n", disastrOS_getpid(), i);
@@ -49,7 +48,7 @@ void childFunction(void* args){
 
 void initFunction(void* args) {
 
-  printf("Stato primordiale del SO:\n");
+  printf("Sto per stamapare lo stato primordiale del SO\n");
   disastrOS_printStatus();
 
   printf("Funzione init appena partirta\n");
@@ -61,8 +60,8 @@ void initFunction(void* args) {
   int alive_children=0;
   for (int i=0; i<10; ++i) {
 
-    //Apro una risorsa nella init, poi la vado ad aprire nella child (?)
-    int type=0;
+    //Imposto che sto per aprire una risorsa di tipo MQ
+    int type=MESSAGE_QUEUE;
     //Imposto che se la risorsa non è già presente la creo
     int mode=DSOS_CREATE;
 
@@ -72,11 +71,13 @@ void initFunction(void* args) {
     int fd=disastrOS_openResource(i,type,mode);
     printf("Sono main, ho aperto con successo una risorsa con fd=%d ed id=%d\n", fd, i);
     
-    printf("%d\n",fd);
-    
-    char message[2] = "p";
-    printf("Prova\n");
-    disastrOS_writeMessageQueue(fd, message, 2);
+    //Creo un buffer statico i cui dati dovranno essere scritti in un messaggio
+    char message[6] = "prova";
+
+    //Scrivo il messaggio in fd
+    disastrOS_writeMessageQueue(fd, message, 6);
+
+    printf("\nHo scritto il messaggio %s in %d\n", message, fd);
 
     //Faccio partire con una system call un la funzione childFunction
     disastrOS_spawn(childFunction, 0);

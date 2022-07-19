@@ -11,13 +11,13 @@ l'elemento che comporrà la lista di MessageQueue
 
 typedef struct {
   ListItem item; //Estensione di ListItem
-  char* message; //Messaggio
+  char message[MAX_LEN_MESSAGE]; //Messaggio
   int sender; //PID di chi ha inviato il messaggio
   int length; //Lunghezza del messaggio
 } Message;
 
 void Message_init();
-Message* Message_alloc();
+Message* Message_alloc(int sender_pid, char* message, int length);
 int Message_free(Message* m);
 
 
