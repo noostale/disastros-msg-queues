@@ -21,6 +21,7 @@ void Message_init(){
 				  _m_buffer,
 				  M_BUFFER_SIZE);
     assert(!result);
+    return;
 }
 
 Message* Message_alloc(int sender_pid, char* message, int length){

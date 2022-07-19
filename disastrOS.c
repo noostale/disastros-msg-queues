@@ -142,6 +142,10 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   Timer_init();
   Resource_init();
   Descriptor_init();
+
+  // Bisogna iniziallizare la Message Queue
+  MessageQueue_init();
+
   init_pcb=0;
 
   // populate the vector of syscalls and number of arguments for each syscall
@@ -298,11 +302,11 @@ int disastrOS_destroyResource(int resource_id) {
 //Imposto le 2 nuove system call di lettura/scrittura dei messaggi
 
 int disastrOS_readMessageQueue(int fd, char* read_buffer){
-
+  return disastrOS_syscall(DSOS_CALL_MQ_READ, fd, read_buffer);
 }
 
 int disastrOS_writeMessageQueue(int fd, char* write_buffer, int message_length){
-
+  return disastrOS_syscall(DSOS_CALL_MQ_WTRITE, fd, write_buffer, message_length);
 }
 
 

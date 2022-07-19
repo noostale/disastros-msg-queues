@@ -26,7 +26,7 @@ void MessageQueue_init(){
 }
 
 
-MessageQueue* MessageQueue_alloc(){
+Resource* MessageQueue_alloc(){
   MessageQueue* mq=(MessageQueue*) PoolAllocator_getBlock(&_mq_allocator);
 
   if (!mq) return 0;
@@ -34,7 +34,7 @@ MessageQueue* MessageQueue_alloc(){
   mq->num_written=0;
   List_init(&mq->messages);
 
-  return mq;
+  return (Resource*)mq;
 }
 
 

@@ -28,6 +28,7 @@ void internal_MessageQueue_read(){
         read_buffer[i]= m -> message[i];
     }
 
+    running->syscall_retvalue = 0;
     return;
     
 }

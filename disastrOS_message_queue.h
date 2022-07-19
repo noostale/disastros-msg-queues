@@ -16,8 +16,8 @@ typedef struct {
   int num_written; //numero di messaggi scritti
 } MessageQueue;
 
-void Resource_init();
-MessageQueue* MessageQueue_alloc();
+void MessageQueue_init();
+Resource* MessageQueue_alloc();
 int MessageQueue_free(MessageQueue* mq);
 
 
