@@ -32,7 +32,7 @@ void childFunction(void* args){
   if (fd >= 0){  //Sennò un pid negativo mi manderebbe in seg_fault
 
     char message[5];
-    int len = disastrOS_readMessageQueue(fd, message);
+    int len = disastrOS_readMessageQueue(fd, message, 5);
     printf("Ho letto il messaggio %s di lunghezza %d dal fd:%d\n", message, len, fd);
   }
   printf("PID: %d, terminating\n", disastrOS_getpid());
