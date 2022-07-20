@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-
 #include "disastrOS.h"
+
+int controllo = 0;
 
 // we need this to handle the sleep state
 void sleeperFunction(void* args){
@@ -13,6 +14,7 @@ void sleeperFunction(void* args){
   while(1) {
     getc(stdin);
     disastrOS_printStatus();
+    printf("controllo: %d\n",controllo);
   }
 }
 
@@ -20,17 +22,21 @@ void sleeperFunction(void* args){
 void childFunction(void* args){
   printf("\nSono la childFunction con pid n. %d\n",disastrOS_getpid());
   printf("Farò uno sleep prima di terminare\n");
+
+  int* id = (int*) args;
   
   int type=MESSAGE_QUEUE;  
   int mode=DSOS_READ;
-  //Apro la risorsa con id pari al pid del processo
+  //Apro la risorsa con id 
 
-  printf("Sto per aprire una risorsa che come id il mio stesso pid\n");
-  int fd = disastrOS_openResource(disastrOS_getpid(),type,mode);
-  printf("Ho aperto una risorsa che ha fd=%d\n", fd);
+  printf("Sto per aprire una risorsa che come id %d\n",*id);
+  int fd = disastrOS_openResource(*id,type,mode);
+  
 
   if (fd >= 0){  //Sennò un pid negativo mi manderebbe in seg_fault
 
+    printf("Ho aperto una risorsa che ha fd=%d\n", fd);
+    controllo--;
     char message[5];
     int len = disastrOS_readMessageQueue(fd, message, 5);
     printf("Ho letto il messaggio %s di lunghezza %d dal fd:%d\n", message, len, fd);
@@ -51,38 +57,41 @@ void initFunction(void* args) {
   printf("Sto per stamapare lo stato primordiale del SO\n");
   disastrOS_printStatus();
 
-  printf("Funzione init appena partirta\n");
-  //Faccio partire in DisastrOS con una system call la funzione sleeperFunction
+  printf("FUNZIONE INIT APPENA PARTITA\n\n");
+  //Inizializzo il contesto per la funzione sleeperFunction
   disastrOS_spawn(sleeperFunction, 0); 
-  
 
-  printf("Faccio partire 10 threads\n");
+  printf("Faccio partire %d writers\n", MAX_NUM_MESSAGES);
   int alive_children=0;
-  for (int i=0; i<10; ++i) {
+  int id[MAX_NUM_MESSAGES];
 
+  for (int i=0; i<MAX_NUM_MESSAGES; ++i) {
+    
     //Imposto che sto per aprire una risorsa di tipo MQ
     int type=MESSAGE_QUEUE;
     //Imposto che se la risorsa non è già presente la creo
     int mode=DSOS_CREATE;
 
-    printf("mode: %d\n", mode);
-    printf("Sto aprendo una risorsa (la creo se necessario)\n");
-    
-    int fd=disastrOS_openResource(i,type,mode);
-    printf("Sono main, ho aperto con successo una risorsa con fd=%d ed id=%d\n", fd, i);
+    printf("Sto aprendo una risorsa (la creo se necessario) con id %d\n", i);
+    int fd = disastrOS_openResource(i,type,mode);
+    controllo++;
+    printf("Ho aperto con successo una risorsa con fd=%d ed id=%d\n", fd, i);
     
     //Creo un buffer statico i cui dati dovranno essere scritti in un messaggio
-    char message[6] = "prova";
+    char message[5] = "test";
 
-    //Scrivo il messaggio in fd
-    disastrOS_writeMessageQueue(fd, message, 6);
+    //Scrivo il messaggio nella mq puntata da fd
+    disastrOS_writeMessageQueue(fd, message, 5);
+    
+    printf("Ho scritto il messaggio %s in %d\n", message, fd);
 
-    printf("\nHo scritto il messaggio %s in %d\n", message, fd);
+    
+    id[i] = i;
 
-    //Faccio partire con una system call un la funzione childFunction
-    disastrOS_spawn(childFunction, 0);
+    disastrOS_spawn(childFunction, (void*) &(id[i]));
+    disastrOS_printStatus();
     alive_children++;
-
+    printf("FINE CICLO WRITER\n\n");
   }
 
   disastrOS_printStatus();

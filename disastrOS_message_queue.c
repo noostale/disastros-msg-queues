@@ -33,7 +33,9 @@ Resource* MessageQueue_alloc(){
   if (!mq) return 0;
   
   mq->num_written=0;
-  List_init(&mq->messages);
+  List_init(&mq -> messages);
+  List_init(&mq -> waiting_to_read);
+  List_init(&mq -> waiting_to_write);
 
   return (Resource*)mq;
 }

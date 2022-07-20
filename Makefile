@@ -50,7 +50,7 @@ BINS=disastrOS_test
 all:	$(LIBS) $(BINS)
 
 %.o:	%.c $(HEADERS)
-	$(CC) $(CCOPTS) -c -o $@  $<
+	$(CC) $(CCOPTS) -g -c -o $@  $<
 
 libdisastrOS.a: $(OBJS) $(HEADERS) 
 	$(AR) -rcs $@ $^

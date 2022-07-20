@@ -33,13 +33,20 @@ void internal_MessageQueue_write(){
     //Controllo se la MQ ha raggiunto il massimo numero di messaggi e se è il caso:
     //1.Metto il processo in attesa
     //2.Inserisco il processo nella lista dei processi in attesa
-    //3.Selezioni come runner il primo processo nella ready list
+    //3.Inserisco il processo nella lista dei processi in attesa di scrivere
+    //4.Selezioni come runner il primo processo nella ready list
 
     if(mq->num_written == MAX_NUM_MESSAGES){
 
         running->status=Waiting;
         List_insert(&waiting_list, waiting_list.last, (ListItem*) running);
-        running = (PCB*) List_detach(&ready_list, ready_list.first);
+        List_insert(&mq->waiting_to_write, mq->waiting_to_write.last, (ListItem*) PCBPtr_alloc(running));
+
+
+        PCB* next_running = (PCB*) List_detach(&ready_list, ready_list.first);
+        
+        next_running -> status = Running;
+        running=next_running;
         return;
 
     }
@@ -56,9 +63,28 @@ void internal_MessageQueue_write(){
     //Inseriamo il messaggio nella lista di messaggi della MQ, dopo l'ultimo elemento
     List_insert(&mq->messages, mq->messages.last, (ListItem*)message);
 
+
+    //Quando scrivo un messaggio e qualcuno che deve leggere è rimasto in attesa,
+    //lo faccio ripartire
+
+    while(mq->waiting_to_read.size > 0){
+
+        //Caccio il puntatore dallo struct di liste di ptr al PCB che deve leggere
+        PCBPtr* reader_ptr = (PCBPtr*)List_detach(&mq->waiting_to_read, mq->waiting_to_read.first);
+        //Rimuovo il processo che deve ripartire dalla lista dei processi in waiting
+        List_detach(&waiting_list, (ListItem*)reader_ptr->pcb);
+
+        PCB* reader = (PCB*) reader_ptr->pcb;
+        reader -> status = Ready;
+
+        //Inserisco il reader nella lista dei ready
+        List_insert(&ready_list, ready_list.last, (ListItem*)reader_ptr->pcb);
+
+    }
+
+
+
     mq -> num_written += 1;
-
-
     //Setto come valore di ritorno della write la lunghezza del messaggio scritto
     running->syscall_retvalue = message_length;
     return;

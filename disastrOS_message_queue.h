@@ -14,6 +14,8 @@ typedef struct {
   Resource resource; //Estensione di resource
   ListHead messages; //lista dei messaggi scritti
   int num_written; //numero di messaggi scritti
+  ListHead waiting_to_read; //lista di processi in attesa di leggere
+  ListHead waiting_to_write; //lista di processi in attesa di scrivere
 } MessageQueue;
 
 void MessageQueue_init();

@@ -19,7 +19,11 @@ void internal_MessageQueue_read(){
     MessageQueue* mq = (MessageQueue*) mq_destination -> resource;
 
     //Trovo la lunghezza del messaggio
-    int message_length = ((Message*)mq -> messages.first) -> length;
+    Message* first_message;
+    if(mq==NULL) { first_message = NULL; }
+    else {first_message = (Message*)mq -> messages.first;}
+
+    int message_length = first_message -> length;
 
     //Controllo che il messaggio che voglio leggere non sia troppo lungo
     if(message_length > buffer_length+1){
@@ -30,13 +34,18 @@ void internal_MessageQueue_read(){
     //Controllo se la MQ ha messaggi da leggere, se non li ha:
     //1.Metto il processo in attesa
     //2.Inserisco il processo nella lista dei processi in attesa
-    //3.Selezioni come runner il primo processo nella ready list
+    //3.Inserisco il processo nella lista dei processi in attesa di leggere
+    //4.Selezioni come runner il primo processo nella ready list
 
     if(mq->messages.first == NULL){
 
         running->status=Waiting;
         List_insert(&waiting_list, waiting_list.last, (ListItem*) running);
-        running = (PCB*) List_detach(&ready_list, ready_list.first);
+        List_insert(&mq->waiting_to_read, mq->waiting_to_read.last, (ListItem*) PCBPtr_alloc(running));
+
+        PCB* next_running= (PCB*) List_detach(&ready_list, ready_list.first);
+        next_running->status = Running;
+        running = next_running;
         return;
     }
 
@@ -48,6 +57,26 @@ void internal_MessageQueue_read(){
         read_buffer[i]= m -> message[i];
     }
 
+    //Quando leggo un messaggio e qualcuno che deve scrivere è rimasto in attesa,
+    //lo faccio ripartire
+
+    while(mq->waiting_to_write.size > 0){
+
+        //Caccio il puntatore dallo struct di liste di ptr al PCB che deve scrivere
+        PCBPtr* writer_prt = (PCBPtr*)List_detach(&mq->waiting_to_write, mq->waiting_to_write.first);
+        //Rimuovo il processo che deve ripartire dalla lista dei processi in waiting
+        List_detach(&waiting_list, (ListItem*)writer_prt->pcb);
+
+        PCB* writer = (PCB*) writer_prt->pcb;
+        writer -> status = Ready;
+
+        //Inserisco il writer nella lista dei ready
+        List_insert(&ready_list, ready_list.last, (ListItem*)writer_prt->pcb);
+
+    }
+
+    mq->num_written -= 1;
+    //Setto come valore di ritorno della read la lunghezza del messaggio letto
     running->syscall_retvalue = message_length;
     return;
     
