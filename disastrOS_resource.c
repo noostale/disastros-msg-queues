@@ -8,20 +8,25 @@
 #include "linked_list.h"
 #include "disastrOS_constants.h"
 
+/**
 //Definisco un puntatore a funzione che restituisce un Resource*
 static Resource* (*resource_alloc_func)(); 
 //Definisco un puntatore a funzione che restituisce un int
 static int (*resource_free_func)(Resource*);
+**/
 
 void Resource_init(){
+  /**
   resource_alloc_func = MessageQueue_alloc; //definisco quale sia la funzione per allocare una MQ
   resource_free_func = MessageQueue_free;  //definisco quale sia la funzione per fare il free di una MQ
+  **/
 }
 
 Resource* Resource_alloc(int id, int type){
   if (type>0)
     return NULL;
-  Resource* r = (*resource_alloc_func)();
+  //Resource* r = (*resource_alloc_func)();
+  Resource* r = MessageQueue_alloc();
 
   if (!r)
     return 0;
@@ -35,7 +40,8 @@ Resource* Resource_alloc(int id, int type){
 int Resource_free(Resource* r) {
   assert(r->descriptors_ptrs.first==0);
   assert(r->descriptors_ptrs.last==0);
-  return (*resource_free_func)(r);
+  //return (*resource_free_func)(r);
+  return MessageQueue_free(r);
 }
 
 Resource* ResourceList_byId(ResourceList* l, int id) {
