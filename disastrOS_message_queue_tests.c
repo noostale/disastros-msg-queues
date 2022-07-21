@@ -5,6 +5,8 @@
 #include <assert.h>
 #include <string.h>
 #include "disastrOS.h"
+#include "disastrOS.c"
+#include "disastrOS_message_queue.h"
 
 int controllo = 0;
 
@@ -87,6 +89,14 @@ void initFunction(void* args) {
 
     
     id[i] = i;
+
+    printf("\nSto per printare una mq con fd=%d ed id=%d\n", fd, i);
+    Resource* res=ResourceList_byId(&resources_list, i);
+
+    printf("Ho aperto una risorsa con id %d\n",res->id);
+
+    MessageQueue* mq = (MessageQueue*) res;
+    MQ_print(mq);
 
     disastrOS_spawn(childFunction, (void*) &(id[i]));
     disastrOS_printStatus();

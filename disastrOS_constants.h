@@ -4,8 +4,10 @@
 #define MAX_NUM_RESOURCES 1024
 #define MAX_NUM_RESOURCES_PER_PROCESS 32
 #define MAX_NUM_DESCRIPTORS_PER_PROCESS 32
-#define MAX_NUM_MESSAGES 32 //Usiamo un PoolAllocator, serve sapere a prescindere lo spazio massimo del buffer
+#define MAX_NUM_MESSAGES 8 //Usiamo un PoolAllocator, serve sapere a prescindere lo spazio massimo del buffer
 #define MAX_LEN_MESSAGE 256
+
+#define MAX_NUM_CHILDREN 3
 
 #define MESSAGE_QUEUE 0 //Per comodità di scrittura nel test
 

@@ -18,18 +18,11 @@ void internal_MessageQueue_read(){
     Descriptor* mq_destination = DescriptorList_byFd(&running -> descriptors, fd);
     MessageQueue* mq = (MessageQueue*) mq_destination -> resource;
 
-    //Trovo la lunghezza del messaggio
     Message* first_message;
     if(mq==NULL) { first_message = NULL; }
     else {first_message = (Message*)mq -> messages.first;}
 
-    int message_length = first_message -> length;
-
-    //Controllo che il messaggio che voglio leggere non sia troppo lungo
-    if(message_length > buffer_length+1){
-        running -> syscall_retvalue = DSOS_EMESSAGETOOLONG;
-        return;
-    }
+    
 
     //Controllo se la MQ ha messaggi da leggere, se non li ha:
     //1.Metto il processo in attesa
@@ -51,6 +44,14 @@ void internal_MessageQueue_read(){
 
     //Salvo il puntatore al primo elemento del messaggio in m
     Message* m = (Message*)List_detach(&mq->messages, mq->messages.first);
+
+    int message_length = first_message -> length;
+
+    //Controllo che il messaggio che voglio leggere non sia troppo lungo
+    if(message_length > buffer_length+1){
+        running -> syscall_retvalue = DSOS_EMESSAGETOOLONG;
+        return;
+    }
 
     //Scrivo il messaggio nel buffer di lettura
     for(int i = 0; i<message_length; i++){

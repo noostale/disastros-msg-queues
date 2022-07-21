@@ -21,6 +21,7 @@ typedef struct {
 void MessageQueue_init();
 Resource* MessageQueue_alloc();
 int MessageQueue_free(Resource* r);
+void MQ_print(MessageQueue* mq);
 
 
 /** DA COMPLETARE PER LA FASE DI TEST

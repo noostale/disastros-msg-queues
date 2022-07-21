@@ -58,16 +58,41 @@ int MessageQueue_free(Resource* r){
 
 
 void MQ_print(MessageQueue* mq){
-  if(mq == NULL) return;
+  if(mq == NULL) {
+    printf("Sono in una mq vuota\n");
+    return;
+  }
 
   ListItem* aux = mq -> messages.first;
   int i = 0;
+
+  printf("Sto per printare una coda\n");
 
   while(aux){
     printf("Messaggio n.%d: %s\n", i, (char*)(((Message*)aux)->message));
     i++;
     aux = aux->next;
   }
+
+  int pid;
+
+  ListItem* read_waiting_list = mq -> waiting_to_read.first;
+  ListItem* write_waiting_list = mq -> waiting_to_write.first;
+
+  while(read_waiting_list){
+    pid = ((PCBPtr*)read_waiting_list)->pcb->pid;
+    printf("Ho un reader in attesa con pid: %d\n", pid);
+    read_waiting_list = read_waiting_list->next;
+  }
+  if(!read_waiting_list) printf("Read waiting list vuota\n");
+
+
+  while(write_waiting_list){
+    pid = ((PCBPtr*)write_waiting_list)->pcb->pid;
+    printf("Ho un reader in attesa con pid: %d\n", pid);
+      write_waiting_list = write_waiting_list->next;
+  }
+  if(!write_waiting_list) printf("Write waiting list vuota\n");
 
   return;
 }
