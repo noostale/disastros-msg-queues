@@ -2,6 +2,7 @@
 #include "linked_list.h"
 #include "disastrOS_pcb.h"
 #include "disastrOS_resource.h"
+#include "disastrOS_mq.h"
 
 
 struct DescriptorPtr;
@@ -10,6 +11,7 @@ typedef struct Descriptor{
   ListItem list;
   PCB* pcb;
   Resource* resource;
+  MessageQueue* mq;
   int fd;
   struct DescriptorPtr* ptr; // pointer to the entry in the resource list
 } Descriptor;
@@ -28,3 +30,6 @@ void DescriptorList_print(ListHead* l);
 DescriptorPtr* DescriptorPtr_alloc(Descriptor* descriptor);
 int DescriptorPtr_free(DescriptorPtr* d);
 void DescriptorPtrList_print(ListHead* l);
+
+Descriptor* Descriptor_alloc_mq(int fd, MessageQueue* res, PCB* pcb);
+void DescriptorPtrList_print_mq(ListHead* l);

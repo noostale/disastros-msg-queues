@@ -2,32 +2,27 @@
 #include <stdio.h>
 #include "disastrOS_resource.h"
 #include "disastrOS_descriptor.h"
-#include "disastrOS_message_queue.h"
-#include "disastrOS_message.h"
 #include "pool_allocator.h"
 #include "linked_list.h"
-#include "disastrOS_constants.h"
 
-/**
-//Definisco un puntatore a funzione che restituisce un Resource*
-static Resource* (*resource_alloc_func)(); 
-//Definisco un puntatore a funzione che restituisce un int
-static int (*resource_free_func)(Resource*);
-**/
+#define RESOURCE_SIZE sizeof(Resource)
+#define RESOURCE_MEMSIZE (sizeof(Resource)+sizeof(int))
+#define RESOURCE_BUFFER_SIZE MAX_NUM_RESOURCES*RESOURCE_MEMSIZE
+
+static char _resources_buffer[RESOURCE_BUFFER_SIZE];
+static PoolAllocator _resources_allocator;
 
 void Resource_init(){
-  /**
-  resource_alloc_func = MessageQueue_alloc; //definisco quale sia la funzione per allocare una MQ
-  resource_free_func = MessageQueue_free;  //definisco quale sia la funzione per fare il free di una MQ
-  **/
+    int result=PoolAllocator_init(& _resources_allocator,
+				  RESOURCE_SIZE,
+				  MAX_NUM_RESOURCES,
+				  _resources_buffer,
+				  RESOURCE_BUFFER_SIZE);
+    assert(! result);
 }
 
 Resource* Resource_alloc(int id, int type){
-  if (type>0)
-    return NULL;
-  //Resource* r = (*resource_alloc_func)();
-  Resource* r = MessageQueue_alloc();
-
+  Resource* r=(Resource*) PoolAllocator_getBlock(&_resources_allocator);
   if (!r)
     return 0;
   r->list.prev=r->list.next=0;
@@ -40,8 +35,7 @@ Resource* Resource_alloc(int id, int type){
 int Resource_free(Resource* r) {
   assert(r->descriptors_ptrs.first==0);
   assert(r->descriptors_ptrs.last==0);
-  //return (*resource_free_func)(r);
-  return MessageQueue_free(r);
+  return PoolAllocator_releaseBlock(&_resources_allocator, r);
 }
 
 Resource* ResourceList_byId(ResourceList* l, int id) {

@@ -11,7 +11,7 @@
 #include "disastrOS_timer.h"
 #include "disastrOS_resource.h"
 #include "disastrOS_descriptor.h"
-#include "disastrOS_message_queue.h"
+#include "disastrOS_mq.h"
 
 FILE* log_file=NULL;
 PCB* init_pcb;
@@ -24,6 +24,8 @@ ListHead timer_list;
 
 // a resource can be a device, a file or an ipc thing
 ListHead resources_list;
+
+ListHead mq_list;
 
 SyscallFunctionType syscall_vector[DSOS_MAX_SYSCALLS];
 int syscall_numarg[DSOS_MAX_SYSCALLS];
@@ -142,10 +144,8 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   Timer_init();
   Resource_init();
   Descriptor_init();
-
-  // Bisogna iniziallizare la Message Queue
   MessageQueue_init();
-
+  Message_init();
   init_pcb=0;
 
   // populate the vector of syscalls and number of arguments for each syscall
@@ -182,13 +182,21 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   syscall_vector[DSOS_CALL_SHUTDOWN]      = internal_shutdown;
   syscall_numarg[DSOS_CALL_SHUTDOWN]      = 0;
 
-  //Aggiungo in syscall_vector le due nuove system call assieme al numero di argomenti
+  //Nuove system call
 
-  syscall_vector[DSOS_CALL_MQ_WRITE]      = internal_MessageQueue_write;
-  syscall_numarg[DSOS_CALL_MQ_WRITE]      = 3;
+  syscall_vector[DSOS_CALL_OPEN_MQ]      = internal_openMessageQueue;
+  syscall_numarg[DSOS_CALL_OPEN_MQ]      = 2;
 
-  syscall_vector[DSOS_CALL_MQ_READ]      = internal_MessageQueue_read;
-  syscall_numarg[DSOS_CALL_MQ_READ]      = 3;
+  syscall_vector[DSOS_CALL_CLOSE_MQ]      = internal_closeMessageQueue;
+  syscall_numarg[DSOS_CALL_CLOSE_MQ]      = 1;
+
+  syscall_vector[DSOS_CALL_WRITE_MQ]      = internal_MessageQueue_write;
+  syscall_numarg[DSOS_CALL_WRITE_MQ]      = 3;
+
+  syscall_vector[DSOS_CALL_READ_MQ]      = internal_MessageQueue_read;
+  syscall_numarg[DSOS_CALL_READ_MQ]      = 3;
+
+
 
   // setup the scheduling lists
   running=0;
@@ -197,6 +205,7 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   List_init(&zombie_list);
   List_init(&resources_list);
   List_init(&timer_list);
+  List_init(&mq_list);
 
 
   /* INITIALIZATION OF SYSCALL AND INTERRUPT INFRASTRUCTIRE*/
@@ -299,14 +308,22 @@ int disastrOS_destroyResource(int resource_id) {
   return disastrOS_syscall(DSOS_CALL_DESTROY_RESOURCE, resource_id);
 }
 
-//Imposto le 2 nuove system call di lettura/scrittura dei messaggi
+// Nuove syscalls
 
-int disastrOS_readMessageQueue(int fd, char* read_buffer, int buffer_length){
-  return disastrOS_syscall(DSOS_CALL_MQ_READ, fd, read_buffer, buffer_length);
+int disastrOS_openMessageQueue(int id, int mode) {
+  return disastrOS_syscall(DSOS_CALL_OPEN_MQ, id, mode);
 }
 
-int disastrOS_writeMessageQueue(int fd, char* write_buffer, int message_length){
-  return disastrOS_syscall(DSOS_CALL_MQ_WRITE, fd, write_buffer, message_length);
+int disastrOS_closeMessageQueue(int fd) {
+  return disastrOS_syscall(DSOS_CALL_CLOSE_MQ, fd);
+}
+
+int disastrOS_MessageQueue_write(int id, char* write_buffer, int len) {
+  return disastrOS_syscall(DSOS_CALL_WRITE_MQ, id, write_buffer, len);
+}
+
+int disastrOS_MessageQueue_read(int id, char* buf, int len) {
+  return disastrOS_syscall(DSOS_CALL_READ_MQ, id, buf, len);
 }
 
 
@@ -321,6 +338,8 @@ void disastrOS_printStatus(){
   TimerList_print(&timer_list);
   printf("\nResources: ");
   ResourceList_print(&resources_list);
+  printf("\nMessage Queues: ");
+  MessageQueueList_print(&mq_list);
   printf("\nReady: ");
   PCBList_print(&ready_list);
   printf("\nWaiting: ");

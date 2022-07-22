@@ -10,11 +10,10 @@ HEADERS=disastrOS.h\
 	disastrOS_resource.h\
 	disastrOS_syscalls.h\
 	disastrOS_timer.h\
-	disastrOS_message_queue.h\
-    disastrOS_message.h\
+    disastrOS_mq.h\
 	linked_list.h\
 	pool_allocator.h\
-
+     
 OBJS=pool_allocator.o\
      linked_list.o\
      disastrOS_timer.o\
@@ -33,11 +32,12 @@ OBJS=pool_allocator.o\
      disastrOS_open_resource.o\
      disastrOS_close_resource.o\
      disastrOS_destroy_resource.o\
-	 disastrOS_message_queue.o\
-     disastrOS_message.o\
-	 disastrOS_message_queue_read.o\
-	 disastrOS_message_queue_write.o\
-
+     disastrOS_mq.o\
+     disastrOS_close_mq.o\
+     disastrOS_open_mq.o\
+     disastrOS_write_mq.o\
+     disastrOS_read_mq.o\
+     
 LIBS=libdisastrOS.a
 
 BINS=disastrOS_test
@@ -56,7 +56,7 @@ libdisastrOS.a: $(OBJS) $(HEADERS)
 	$(AR) -rcs $@ $^
 	$(RM) $(OBJS)
 
-disastrOS_test:		disastrOS_message_queue_tests.c $(LIBS)
+disastrOS_test:		disastrOS_test.c $(LIBS)
 	$(CC) $(CCOPTS) -o $@ $^
 
 clean:

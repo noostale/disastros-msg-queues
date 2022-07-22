@@ -25,6 +25,10 @@ void internal_closeResource();
 
 void internal_destroyResource();
 
-void internal_MessageQueue_write();
+void internal_openMessageQueue();
 
 void internal_MessageQueue_read();
+
+void internal_MessageQueue_write();
+
+void internal_closeMessageQueue();

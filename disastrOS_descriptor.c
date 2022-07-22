@@ -3,6 +3,7 @@
 #include "disastrOS_descriptor.h"
 #include "pool_allocator.h"
 #include "disastrOS_constants.h"
+#include "disastrOS_mq.h"
 
 #define DESCRIPTOR_SIZE sizeof(Descriptor)
 #define DESCRIPTOR_MEMSIZE (sizeof(Descriptor)+sizeof(int))
@@ -42,6 +43,18 @@ Descriptor* Descriptor_alloc(int fd, Resource* res, PCB* pcb) {
   d->list.prev=d->list.next=0;
   d->fd=fd;
   d->resource=res;
+  d->pcb=pcb;
+  return d;
+}
+
+Descriptor* Descriptor_alloc_mq(int fd, MessageQueue* mq, PCB* pcb) {
+  Descriptor* d=(Descriptor*)PoolAllocator_getBlock(&_descriptor_allocator);
+  if (!d)
+    return 0;
+  d->list.prev=d->list.next=0;
+  d->fd=fd;
+  d->resource=0;
+  d->mq=mq;
   d->pcb=pcb;
   return d;
 }
@@ -99,6 +112,22 @@ void DescriptorPtrList_print(ListHead* l){
 	   d->descriptor->fd,
 	   d->descriptor->pcb->pid,
 	   d->descriptor->resource->id);
+    if(aux->next)
+      printf(", ");
+    aux=aux->next;
+  }
+  printf("]");
+}
+
+void DescriptorPtrList_print_mq(ListHead* l){
+  ListItem* aux=l->first;
+  printf("[");
+  while(aux){
+    DescriptorPtr* d=(DescriptorPtr*)aux;
+    printf("(fd: %d, pid: %d, mqid:%d)",
+	   d->descriptor->fd,
+	   d->descriptor->pcb->pid,
+	   d->descriptor->mq->id);
     if(aux->next)
       printf(", ");
     aux=aux->next;
