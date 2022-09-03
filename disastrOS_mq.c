@@ -7,7 +7,7 @@
 
 #define MESSAGEQUEUE_SIZE sizeof(MessageQueue)
 #define MESSAGEQUEUE_MEMSIZE (sizeof(MessageQueue)+sizeof(int))
-#define MESSAGEQUEUE_BUFFER_SIZE MAX_NUM_MESSAGEQUEUES*MESSAGEQUEUE_MEMSIZE
+#define MESSAGEQUEUE_BUFFER_SIZE MAX_NUM_MESSAGEQUEUES*MESSAGEQUEUE_MEMSIZE*100
 
 static char _messagequeues_buffer[MESSAGEQUEUE_BUFFER_SIZE];
 static PoolAllocator _messagequeues_allocator;
@@ -25,7 +25,7 @@ MessageQueue* MessageQueue_alloc(int id){
   MessageQueue* r=(MessageQueue*) PoolAllocator_getBlock(&_messagequeues_allocator);
   if (!r)
     return 0;
-  r->list.prev=r->list.next=0;
+  //r->list.prev=r->list.next=0;
   r->id=id;
   r->num_written = 0;
   List_init(&r->descriptors_ptrs);
@@ -55,25 +55,39 @@ MessageQueue* MessageQueueList_byId(MessageQueueList* l, int id) {
 void MessageQueue_print(MessageQueue* r) {
   printf("mq di id: %d, contiene %d messaggi, i suoi valori sono:", r->id, r->num_written);
   DescriptorPtrList_print_mq(&r->descriptors_ptrs);
+  printf("\n");
   if(r == NULL)
     return;
 
-  /**
   
   ListItem* m = r -> messages.first;
   int i = 0;
   if(m == NULL){
-    printf("\nEmpty message queue.\n");
+    printf("Empty message queue.\n");
   }
   while(m){
-    printf("\n%d\n",r->id);
-    sleep(10);
     printf("MESSAGGIO %d: %s \n", i, (char*)(((Message*)m)->message));
     i++;
     m = m -> next;
   }
   //MessageList_print(&(r->messages));
-  **/
+
+  ListItem* waiting_to_read = r -> waiting_to_read.first;
+  ListItem* waiting_to_write = r -> waiting_to_write.first;
+
+  if(waiting_to_read == NULL) printf("Non c'è nessun reader in attesa nella mq\n");
+
+  while(waiting_to_read){
+    printf("READER IN ATTESA HA PID: %d\n", ((PCBPtr*)waiting_to_read)->pcb->pid);
+    waiting_to_read = waiting_to_read->next;
+  }
+
+  if(waiting_to_write == NULL) printf("Non c'è nessun writer in attesa nella mq\n");
+
+  while(waiting_to_write){
+    printf("WRITER IN ATTESA HA PID: %d\n", ((PCBPtr*)waiting_to_write)->pcb->pid);
+        waiting_to_write = waiting_to_write->next;
+  }
 }
 
 void MessageQueueList_print(ListHead* l){
@@ -86,9 +100,6 @@ void MessageQueueList_print(ListHead* l){
     if(aux->next)
       printf(",");
     printf("\n");
-
-    
-
     aux=aux->next;
   }
   printf("}\n");
@@ -98,7 +109,7 @@ void MessageQueueList_print(ListHead* l){
 
 #define MESSAGE_SIZE sizeof(Message)
 #define MESSAGE_MEMSIZE (sizeof(Message)+sizeof(int))
-#define MESSAGE_BUFFER_SIZE MAX_NUM_MESSAGES*MESSAGE_MEMSIZE
+#define MESSAGE_BUFFER_SIZE MAX_NUM_MESSAGES*MESSAGE_MEMSIZE*MAX_NUM_MESSAGEQUEUES*MESSAGES_EXTRA*100
 
 static char _messages_buffer[MESSAGE_BUFFER_SIZE];
 static PoolAllocator _messages_allocator;
@@ -106,7 +117,7 @@ static PoolAllocator _messages_allocator;
 void Message_init(){
     int result=PoolAllocator_init(& _messages_allocator,
 				  MESSAGE_SIZE,
-				  MAX_NUM_MESSAGES,
+				  MAX_NUM_MESSAGES*MAX_NUM_MESSAGEQUEUES*MESSAGES_EXTRA*10,
 				  _messages_buffer,
 				  MESSAGE_BUFFER_SIZE);
     assert(! result);
@@ -143,13 +154,11 @@ void Message_print(Message* r) {
   printf("MESSAGGIO: '%s' di lunghezza %d", r->message, r->length);
 }
 
-
 void MessageList_print(ListHead* l){
   
   ListItem* aux=l->first;
   printf("{\n");
   while(aux){
-    sleep(40);
     Message* r=(Message*)aux;
     printf("\t");
     Message_print(r);

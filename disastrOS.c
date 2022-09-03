@@ -21,7 +21,12 @@ ListHead ready_list;
 ListHead waiting_list;
 ListHead zombie_list;
 ListHead timer_list;
-
+/**
+int reader_messi_in_pausa = 0;
+int reader_fatti_ripartire = 0;
+int writer_messi_in_pausa = 0;
+int writer_fatti_ripartire = 0;
+**/
 // a resource can be a device, a file or an ipc thing
 ListHead resources_list;
 
@@ -43,7 +48,9 @@ volatile int disastrOS_time=0;
 
 
 void timerHandler(int j, siginfo_t *si, void *old_context) {
+  printf("Sono entrato nella funzione timerHandler, sto per fare uno swap\n");
   swapcontext(&running->cpu_state, &interrupt_context);
+  printf("Ho fatto uno swap in TimerHandler\n");
 }
 
 void timerInterrupt(){

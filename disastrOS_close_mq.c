@@ -8,6 +8,7 @@
 
 
 void internal_closeMessageQueue(){
+  
   //1 retrieve the fd of the resource to close
   int fd=running->syscall_args[0];
 

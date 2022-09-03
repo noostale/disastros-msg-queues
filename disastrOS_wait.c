@@ -5,6 +5,7 @@
 #include "disastrOS_syscalls.h"
 
 void internal_wait(){
+  printf("SONO NELLA INTERNAL WAIT\n");
   int pid_to_wait=running->syscall_args[0];
   int* result=(int*) running->syscall_args[1];
   // error conditions:

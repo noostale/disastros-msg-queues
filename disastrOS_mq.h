@@ -25,6 +25,8 @@ MessageQueue* MessageQueueList_byId(MessageQueueList* l, int id);
 
 void MessageQueueList_print(ListHead* l);
 
+void MessageQueue_print(MessageQueue* r);
+
 
 //Messaggi
 
