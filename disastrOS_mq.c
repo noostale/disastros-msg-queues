@@ -55,7 +55,7 @@ MessageQueue* MessageQueueList_byId(MessageQueueList* l, int id) {
 void MessageQueue_print(MessageQueue* r) {
   printf("mq di id: %d, contiene %d messaggi, i suoi valori sono:", r->id, r->num_written);
   DescriptorPtrList_print_mq(&r->descriptors_ptrs);
-  printf("\n");
+  printf("\n\n");
   if(r == NULL)
     return;
 
@@ -63,29 +63,33 @@ void MessageQueue_print(MessageQueue* r) {
   ListItem* m = r -> messages.first;
   int i = 0;
   if(m == NULL){
-    printf("Empty message queue.\n");
+    printf("        Message queue vuota.\n");
+  } else {
+    printf("        Lista dei messaggi contenuti nella MQ:\n");
   }
   while(m){
-    printf("MESSAGGIO %d: %s \n", i, (char*)(((Message*)m)->message));
+    printf("        - messaggio %d: %s \n", i, (char*)(((Message*)m)->message));
     i++;
     m = m -> next;
   }
   //MessageList_print(&(r->messages));
 
+  printf("\n");
+
   ListItem* waiting_to_read = r -> waiting_to_read.first;
   ListItem* waiting_to_write = r -> waiting_to_write.first;
 
-  if(waiting_to_read == NULL) printf("Non c'è nessun reader in attesa nella mq\n");
+  if(waiting_to_read == NULL) printf("        Non c'è nessun reader in attesa nella mq\n");
 
   while(waiting_to_read){
-    printf("READER IN ATTESA HA PID: %d\n", ((PCBPtr*)waiting_to_read)->pcb->pid);
+    printf("        Un reader in attesa ha pid: %d\n", ((PCBPtr*)waiting_to_read)->pcb->pid);
     waiting_to_read = waiting_to_read->next;
   }
 
-  if(waiting_to_write == NULL) printf("Non c'è nessun writer in attesa nella mq\n");
+  if(waiting_to_write == NULL) printf("        Non c'è nessun writer in attesa nella mq\n");
 
   while(waiting_to_write){
-    printf("WRITER IN ATTESA HA PID: %d\n", ((PCBPtr*)waiting_to_write)->pcb->pid);
+    printf("        Un writer in attesa ha pid: %d\n", ((PCBPtr*)waiting_to_write)->pcb->pid);
         waiting_to_write = waiting_to_write->next;
   }
 }

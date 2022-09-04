@@ -23,7 +23,7 @@ void internal_closeMessageQueue(){
   des = (Descriptor*) List_detach(&running->descriptors, (ListItem*) des);
   assert(des);
 
-  Resource* res=des->resource;
+  MessageQueue* res=des->mq;
 
   // we remove the descriptor pointer from the resource list
   DescriptorPtr* desptr=(DescriptorPtr*) List_detach(&res->descriptors_ptrs, (ListItem*)(des->ptr));

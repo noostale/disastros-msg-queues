@@ -47,10 +47,12 @@ char signal_stack[STACK_SIZE];
 volatile int disastrOS_time=0;
 
 
+
+
 void timerHandler(int j, siginfo_t *si, void *old_context) {
-  printf("Sono entrato nella funzione timerHandler, sto per fare uno swap\n");
+  if(DEBUG==1) printf("Sono entrato nella funzione timerHandler, sto per fare uno swap\n");
   swapcontext(&running->cpu_state, &interrupt_context);
-  printf("Ho fatto uno swap in TimerHandler\n");
+  if(DEBUG==1) printf("Ho fatto uno swap in TimerHandler\n");
 }
 
 void timerInterrupt(){
@@ -194,14 +196,17 @@ void disastrOS_start(void (*f)(void*), void* f_args, char* logfile){
   syscall_vector[DSOS_CALL_OPEN_MQ]      = internal_openMessageQueue;
   syscall_numarg[DSOS_CALL_OPEN_MQ]      = 2;
 
-  syscall_vector[DSOS_CALL_CLOSE_MQ]      = internal_closeMessageQueue;
-  syscall_numarg[DSOS_CALL_CLOSE_MQ]      = 1;
+  syscall_vector[DSOS_CALL_CLOSE_MQ]     = internal_closeMessageQueue;
+  syscall_numarg[DSOS_CALL_CLOSE_MQ]     = 1;
 
-  syscall_vector[DSOS_CALL_WRITE_MQ]      = internal_MessageQueue_write;
-  syscall_numarg[DSOS_CALL_WRITE_MQ]      = 3;
+  syscall_vector[DSOS_CALL_WRITE_MQ]     = internal_MessageQueue_write;
+  syscall_numarg[DSOS_CALL_WRITE_MQ]     = 3;
 
   syscall_vector[DSOS_CALL_READ_MQ]      = internal_MessageQueue_read;
   syscall_numarg[DSOS_CALL_READ_MQ]      = 3;
+
+  syscall_vector[DSOS_CALL_DESTROY_MQ]   = internal_destroyMessageQueue;
+  syscall_numarg[DSOS_CALL_DESTROY_MQ]   = 1;
 
 
 
@@ -333,10 +338,14 @@ int disastrOS_MessageQueue_read(int id, char* buf, int len) {
   return disastrOS_syscall(DSOS_CALL_READ_MQ, id, buf, len);
 }
 
+int disastrOS_MessageQueue_destroy(int id) {
+  return disastrOS_syscall(DSOS_CALL_DESTROY_MQ, id);
+}
+
 
 
 void disastrOS_printStatus(){
-  printf("****************** DisastrOS ******************\n");
+  printf("\n****************** DisastrOS ******************\n");
   printf("Running: ");
   if (running)
     PCB_print(running);

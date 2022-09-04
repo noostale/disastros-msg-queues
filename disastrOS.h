@@ -41,6 +41,7 @@ int disastrOS_openMessageQueue(int id, int mode);
 int disastrOS_closeMessageQueue(int fd);
 int disastrOS_MessageQueue_write(int id, char* write_buffer, int len);
 int disastrOS_MessageQueue_read(int id, char* buf, int len);
+int disastrOS_MessageQueue_destroy(int id);
 
 
 // debug function, prints the state of the internal system

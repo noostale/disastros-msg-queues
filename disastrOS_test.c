@@ -14,8 +14,6 @@ int letti = 0;
 int scritti = 0;
 
 
-#define CHILDREN 2
-
 // we need this to handle the sleep state
 void sleeperFunction(void* args){
   printf("Ciao, sono la funzione sleep partita dal processo n. %d\n",disastrOS_getpid());
@@ -37,21 +35,21 @@ void child_reader(void* args){
   if(disastrOS_getpid()%3 != 0)
     disastrOS_sleep(12);
 
-  char arrDst[5];
+  char arrDst[4];
   int res;
 
   for(int j = 0; j<MAX_NUM_MESSAGES+MESSAGES_EXTRA; j++){
     res = -20;
     while(res == -20){
-      res = disastrOS_MessageQueue_read(i,arrDst,5); //ho messo fd attento
+      res = disastrOS_MessageQueue_read(i,arrDst,MAX_LEN_MESSAGE);
       disastrOS_printStatus();
     }
     letti++;
   }
   
-  //disastrOS_closeMessageQueue(fd);
+  disastrOS_closeMessageQueue(fd);
   printf("PID: %d, sta terminando\n", disastrOS_getpid());
-  disastrOS_exit(disastrOS_getpid()+1);
+  disastrOS_exit(fd);
 }
 
 
@@ -72,16 +70,15 @@ void child_writer(void* args) {
   for(int j = 0; j<MAX_NUM_MESSAGES+MESSAGES_EXTRA; j++){
     res = -20;
     while(res == -20){
-      res = disastrOS_MessageQueue_write(i,arrSource,5); //HO MESSO FD AL POSTO DI I
+      res = disastrOS_MessageQueue_write(i,arrSource,5);
       disastrOS_printStatus();
     }
     scritti++;
   }
 
-  //disastrOS_closeMessageQueue(fd);
+  disastrOS_closeMessageQueue(fd);
   printf("PID: %d, sta terminando\n", disastrOS_getpid());
-  disastrOS_exit(disastrOS_getpid()+1);
-  
+  disastrOS_exit(fd);
 }
 
 
@@ -117,7 +114,7 @@ void initFunction(void* args) {
     ++counter;
   }
   
- /**
+  /**
   int counter = 0;
   for(int i=0; i<CHILDREN; i++){
 
@@ -142,15 +139,15 @@ void initFunction(void* args) {
   }
 
   printf("SONO INIT, HO FINITO DI SPAWNARE PROCESSI READER\n");
-  
-  **/
 
-  /**
+  //OPPURE
+
   for(int i=0; i<MAX_NUM_MESSAGEQUEUES; i++){
     disastrOS_spawn(child_writer, qids+i);
     disastrOS_spawn(child_reader, qids+i);
     alive_children+=2;
   }
+  
   **/
   
   disastrOS_printStatus();
@@ -165,8 +162,11 @@ void initFunction(void* args) {
   }
 
   printf("SE %d E %d COINCIDONO IL PROGRAMMA HA LETTO E SCRITTO LO STESSO NUMERO DI MESSAGGI\n", scritti, letti);
+  printf("Distruggo le MQ\n");
+  for (int i=0; i<MAX_NUM_MESSAGEQUEUES; i++){
+    disastrOS_MessageQueue_destroy(i);
+  }
   printf("Spegnimento del SO\n");
-  //printf("%d %d %d %d", writer_messi_in_pausa, writer_fatti_ripartire, reader_messi_in_pausa, reader_fatti_ripartire);
   disastrOS_shutdown();
 }
 
@@ -184,7 +184,18 @@ int main(int argc, char** argv){
   printf("\n---------------TEST MESSAGE QUEUE IN DISASTROS - FRASCA EMANUELE---------------\n");
   // spawn an init process
   
-  printf("AVVIO SISTEMA OPERATIVO\n");
+  printf(R"(
+   _____  _               _              ____   _____ 
+  |  __ \(_)             | |            / __ \ / ____| 
+  | |  | |_ ___  __ _ ___| |_ _ __ ___ | |  | | (___   
+  | |  | | / __|/ _` / __| __| '__/ _ \| |  | |\___ |
+  | |__| | \__ \ (_| \__ \ |_| | | (_) | |__| |____) | 
+  |_____/|_|___/\__,_|___/\__|_|  \___/ \____/|_____/  
+                                                        
+  Ver. 2.0 Frasca Emanuele)");
+  printf("\n\n");
+
+  sleep(1);
   disastrOS_start(initFunction, 0, logfilename);
   return 0;
 }

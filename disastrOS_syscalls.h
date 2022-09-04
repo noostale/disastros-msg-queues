@@ -32,3 +32,5 @@ void internal_MessageQueue_read();
 void internal_MessageQueue_write();
 
 void internal_closeMessageQueue();
+
+void internal_destroyMessageQueue();

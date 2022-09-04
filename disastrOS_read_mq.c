@@ -6,6 +6,7 @@
 #include "disastrOS_resource.h"
 #include "disastrOS_descriptor.h"
 #include <assert.h>
+#include "disastrOS_constants.h"
 
 
 void internal_MessageQueue_read() {
@@ -15,7 +16,7 @@ void internal_MessageQueue_read() {
   //1 get from the PCB the resource id of the resource to open
   int id=running->syscall_args[0];
   char* buf_des = (char*)running -> syscall_args[1];
-  int m_length=running->syscall_args[1];
+  int buf_length=running->syscall_args[2];
 
 
   /**
@@ -104,13 +105,20 @@ void internal_MessageQueue_read() {
 
   }
 
-  if((ListItem*)first_message == NULL) printf("TEST\n\n\n\n");
+  if((ListItem*)first_message == NULL) return;
+
+  
+  if(first_message->length > buf_length){
+    printf("DEBUGGGGGGGGGGGGGGG");
+    running -> syscall_retvalue = -15;
+    return;
+  }
+  
 
   List_detach(&mq->messages, (ListItem*)first_message);
 
   printf("Il processo con ID: %d ha appena letto un messaggio dalla Message Queue di ID: %d, \"%s\"\n",
          running->pid, id, first_message->message);
-
 
   while(mq->waiting_to_write.size > 0){
     printf("Il processo con ID: %d riattiva un writer che era precedentemente in attesa\n", running->pid);
@@ -130,6 +138,16 @@ void internal_MessageQueue_read() {
     assert(PCBPtr_free(writer_prt)>=0);
   }
   
+  
+  int m_length=first_message->length;
+  
+  if (first_message && mq->waiting_to_write.size == 0){
+    for(int i=0; i<m_length; i++){
+      buf_des[i] = first_message->message[i];
+    }
+  }
+  
+
   mq -> num_written -= 1;
   running -> syscall_retvalue = m_length;
 

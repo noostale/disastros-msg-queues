@@ -1,15 +1,23 @@
 #pragma once
 
+
+// system
+#define DEBUG 0 
+#define STACK_SIZE 16384 //16384
+
+
 #define MAX_NUM_PROCESSES 2048
 #define MAX_NUM_RESOURCES 2048
 #define MAX_NUM_RESOURCES_PER_PROCESS 520
 #define MAX_NUM_DESCRIPTORS_PER_PROCESS 520
+
+// messages
 #define MAX_LEN_MESSAGE 64
-#define MAX_NUM_MESSAGEQUEUES 2
-#define MAX_NUM_MESSAGES 128
+#define MAX_NUM_MESSAGEQUEUES 4
+#define MAX_NUM_MESSAGES 32
 #define MESSAGES_EXTRA 16
-//16384
-#define STACK_SIZE 2<<18
+#define CHILDREN 4
+
 // signals
 #define MAX_SIGNALS 32
 #define DSOS_SIGCHLD 0x1
@@ -29,6 +37,7 @@
 #define DSOS_ERESOURCENOFD -11
 #define DSOS_ERESOURCECLOSE -12
 #define DSOS_ERESOURCEINUSE -13
+#define DSOS_EMQMEXTOOLOONG -14
 
 // syscall numbers
 #define DSOS_MAX_SYSCALLS 32
@@ -47,6 +56,7 @@
 #define DSOS_CALL_CLOSE_MQ  12
 #define DSOS_CALL_WRITE_MQ  13
 #define DSOS_CALL_READ_MQ  14
+#define DSOS_CALL_DESTROY_MQ  15
 
 //resources
 #define DSOS_CREATE 0x1

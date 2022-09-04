@@ -25,13 +25,14 @@ typedef struct {
 } Message;
 ```
 
-Per far gestire al SO queste strutture sono state installate quattro nuove system call le quali permettono di aprire, chiudere, scrivere o leggere un messaggio.
+Per far gestire al SO queste strutture sono state installate quattro nuove system call le quali permettono di aprire, chiudere, scrivere, leggere e distruggere una Message Queue.
 
 ```C
 int disastrOS_openMessageQueue(int id, int mode)
 int disastrOS_closeMessageQueue(int fd)
 int disastrOS_MessageQueue_write(int id, char* write_buffer, int len)
 int disastrOS_MessageQueue_read(int id, char* buf, int len)
+int disastrOS_MessageQueue_destroy(int id)
 ```
 Ed esse sono state opportunamente aggiunte al System Call Vector.
 

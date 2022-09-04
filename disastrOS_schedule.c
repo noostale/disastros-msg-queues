@@ -7,7 +7,7 @@
 // replaces the running process with the next one in the ready list
 void internal_schedule() {
 
-  printf("Sono nella internal_schedule\n");
+  if(DEBUG==1) printf("SONO NELLA INTERNAL_SCHEDULE\n");
 
   if (running) {
     disastrOS_debug("PREEMPT - %d ->", running->pid);

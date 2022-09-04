@@ -16,7 +16,7 @@ void internal_exit(){
   // 2nd register in pcb contains the exit value
   running->return_value=running->syscall_args[0];
     
-  printf("Ho avviauto una exit\n");
+  if(DEBUG==1) printf("SONO NELLA INTERNAL_EXIT\n");
 
   assert(init_pcb);
   while(running->children.first){
@@ -80,8 +80,8 @@ void internal_exit(){
       List_detach(&running->descriptors, (ListItem*) des);
       //Resource* res=des->resource;
       //List_detach(&res->descriptors_ptrs, (ListItem*) des->ptr);
-      //MessageQueue* mq = des->mq;
-      //List_detach(&mq->descriptors_ptrs,(ListItem*)des->ptr);
+      MessageQueue* mq = des->mq;
+      List_detach(&mq->descriptors_ptrs,(ListItem*)des->ptr);
       DescriptorPtr_free(des->ptr);
       Descriptor_free(des);
     }
