@@ -16,7 +16,7 @@ void sleeperFunction(void* args){
   printf("Ciao, sono la funzione sleep partita dal processo n. %d\n",disastrOS_getpid());
   while(1) {
     getc(stdin);
-    disastrOS_printStatus();
+    //disastrOS_printStatus();
     printf("controllo: %d\n",controllo);
   }
 }
@@ -58,7 +58,7 @@ void childFunction(void* args){
 void initFunction(void* args) {
 
   printf("Sto per stamapare lo stato primordiale del SO\n");
-  disastrOS_printStatus();
+  //disastrOS_printStatus();
 
   printf("FUNZIONE INIT APPENA PARTITA\n\n");
   //Inizializzo il contesto per la funzione sleeperFunction
@@ -100,17 +100,17 @@ void initFunction(void* args) {
     id[i] = i;
 
     disastrOS_spawn(childFunction, (void*) &(id[i]));
-    disastrOS_printStatus();
+    //disastrOS_printStatus();
     alive_children++;
     printf("FINE CICLO WRITER\n\n");
   }
 
-  disastrOS_printStatus();
+  //disastrOS_printStatus();
   int retval;
   int pid;
   //Finchè ci sono processi attivi, salvo in ret il loro valore di ritorno
   while(alive_children > 0 && (pid=disastrOS_wait(0, &retval))>=0){ 
-    disastrOS_printStatus();
+    //disastrOS_printStatus();
     printf("initFunction, child: %d terminato, retval:%d, alive: %d \n", pid, retval, alive_children);
     --alive_children;
   }

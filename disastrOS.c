@@ -60,9 +60,14 @@ void timerInterrupt(){
     fprintf(log_file, "TIME: %d\tPID: %d\tACTION: %s\n", disastrOS_time, running->pid, "TIMER_OUT");
   ++disastrOS_time;
   printf("time: %d\n", disastrOS_time);
+
   internal_schedule();
+
   if (log_file)
     fprintf(log_file, "TIME: %d\tPID: %d\tACTION: %s\n", disastrOS_time, running->pid, "TIMER_IN");
+
+  printf("running pid: %d\n", running->pid);
+  //disastrOS_printStatus();
   setcontext(&running->cpu_state);
 }
 
@@ -142,7 +147,7 @@ void disastrOS_trap(){
     setcontext(&running->cpu_state);
   else {
     printf("no active processes\n");
-    disastrOS_printStatus();
+    //disastrOS_printStatus();
   }
 }
 

@@ -28,7 +28,7 @@ void internal_sleep(){
   else {
     running=0;
     printf ("they are all sleeping\n");
-    disastrOS_printStatus();
+    //disastrOS_printStatus();
   }
 }
 

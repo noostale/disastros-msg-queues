@@ -7,7 +7,7 @@
 
 #define MESSAGEQUEUE_SIZE sizeof(MessageQueue)
 #define MESSAGEQUEUE_MEMSIZE (sizeof(MessageQueue)+sizeof(int))
-#define MESSAGEQUEUE_BUFFER_SIZE MAX_NUM_MESSAGEQUEUES*MESSAGEQUEUE_MEMSIZE*100
+#define MESSAGEQUEUE_BUFFER_SIZE MAX_NUM_MESSAGEQUEUES*MESSAGEQUEUE_MEMSIZE*10
 
 static char _messagequeues_buffer[MESSAGEQUEUE_BUFFER_SIZE];
 static PoolAllocator _messagequeues_allocator;
@@ -113,7 +113,7 @@ void MessageQueueList_print(ListHead* l){
 
 #define MESSAGE_SIZE sizeof(Message)
 #define MESSAGE_MEMSIZE (sizeof(Message)+sizeof(int))
-#define MESSAGE_BUFFER_SIZE MAX_NUM_MESSAGES*MESSAGE_MEMSIZE*MAX_NUM_MESSAGEQUEUES*MESSAGES_EXTRA*100
+#define MESSAGE_BUFFER_SIZE MAX_NUM_MESSAGES*MESSAGE_MEMSIZE*MAX_NUM_MESSAGEQUEUES*MESSAGES_EXTRA*10
 
 static char _messages_buffer[MESSAGE_BUFFER_SIZE];
 static PoolAllocator _messages_allocator;

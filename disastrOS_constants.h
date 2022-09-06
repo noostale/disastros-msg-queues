@@ -2,7 +2,7 @@
 
 
 // system
-#define DEBUG 0 
+#define DEBUG 0
 #define STACK_SIZE 16384 //16384
 
 
@@ -14,8 +14,8 @@
 // messages
 #define MAX_LEN_MESSAGE 64
 #define MAX_NUM_MESSAGEQUEUES 4
-#define MAX_NUM_MESSAGES 32
-#define MESSAGES_EXTRA 16
+#define MAX_NUM_MESSAGES 256
+#define MESSAGES_EXTRA 32
 #define CHILDREN 4
 
 // signals

@@ -36,14 +36,9 @@ void child_reader(void* args){
     disastrOS_sleep(12);
 
   char arrDst[4];
-  int res;
 
   for(int j = 0; j<MAX_NUM_MESSAGES+MESSAGES_EXTRA; j++){
-    res = -20;
-    while(res == -20){
-      res = disastrOS_MessageQueue_read(i,arrDst,MAX_LEN_MESSAGE);
-      disastrOS_printStatus();
-    }
+    disastrOS_MessageQueue_read(i,arrDst,MAX_LEN_MESSAGE);
     letti++;
   }
   
@@ -64,15 +59,9 @@ void child_writer(void* args) {
     disastrOS_sleep(10);
   if(disastrOS_getpid()%5 != 0)
     disastrOS_sleep(7);
-
-  int res;
   
   for(int j = 0; j<MAX_NUM_MESSAGES+MESSAGES_EXTRA; j++){
-    res = -20;
-    while(res == -20){
-      res = disastrOS_MessageQueue_write(i,arrSource,5);
-      disastrOS_printStatus();
-    }
+    disastrOS_MessageQueue_write(i,arrSource,5);
     scritti++;
   }
 
@@ -100,7 +89,6 @@ void initFunction(void* args) {
 
   printf("Ho terminato di creare tutte le Message Queues di cui ho bisogno\n");
 
-  
   int counter = 0;
   for(int i=0; i<CHILDREN; i++){
 
@@ -114,48 +102,11 @@ void initFunction(void* args) {
     ++counter;
   }
   
-  /**
-  int counter = 0;
-  for(int i=0; i<CHILDREN; i++){
-
-    if(counter == MAX_NUM_MESSAGEQUEUES)
-      counter = 0;
-    printf("Sto per spawnare un writer\n");
-    disastrOS_spawn(child_writer, qids+counter);
-    ++alive_children;
-    ++counter;
-  }
-  printf("SONO INIT, HO FINITO DI SPAWNARE PROCESSI WRITER\n");
-
-  counter = 0;
-  for(int i=0; i<CHILDREN; i++){
-
-    if(counter == MAX_NUM_MESSAGEQUEUES)
-      counter = 0;
-    printf("Sto per spawnare un reader\n");
-    disastrOS_spawn(child_reader, qids+counter);
-    ++alive_children;
-    ++counter;
-  }
-
-  printf("SONO INIT, HO FINITO DI SPAWNARE PROCESSI READER\n");
-
-  //OPPURE
-
-  for(int i=0; i<MAX_NUM_MESSAGEQUEUES; i++){
-    disastrOS_spawn(child_writer, qids+i);
-    disastrOS_spawn(child_reader, qids+i);
-    alive_children+=2;
-  }
-  
-  **/
-  
-  disastrOS_printStatus();
-
   int retval = 0;
   int pid = 0;
+
   //Finchè ci sono processi attivi, salvo in ret il loro valore di ritorno
-  while(alive_children > 0 && printf("STO PER FARE UNA WAIT, SONO MAIN\n") && (pid=disastrOS_wait(0, &retval))>=0){
+  while(alive_children > 0 && (pid=disastrOS_wait(0, &retval))>=0){
     disastrOS_printStatus();
     printf("initFunction, child: %d terminato, retval:%d, alive: %d \n", pid, retval, alive_children);
     --alive_children;
@@ -192,9 +143,8 @@ int main(int argc, char** argv){
   | |__| | \__ \ (_| \__ \ |_| | | (_) | |__| |____) | 
   |_____/|_|___/\__,_|___/\__|_|  \___/ \____/|_____/  
                                                         
-  Ver. 2.0 Frasca Emanuele)");
+  Ver. 2.1 Frasca Emanuele)");
   printf("\n\n");
-
   sleep(1);
   disastrOS_start(initFunction, 0, logfilename);
   return 0;

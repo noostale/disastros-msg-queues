@@ -9,8 +9,8 @@
 
 
 void internal_MessageQueue_write(){
-  printf("Il processo con ID: %d sta per scrivere un messaggio nella Message Queue con ID: %ld\n",
-         running->pid, running->syscall_args[0]);
+  //printf("Il processo con ID: %d sta per scrivere un messaggio nella Message Queue con ID: %ld\n",
+  //       running->pid, running->syscall_args[0]);
 
   //1 get from the PCB the resource id of the resource to open
   int id=running->syscall_args[0];
@@ -22,13 +22,7 @@ void internal_MessageQueue_write(){
     return;
   }
 
-  //Descriptor* mq_des = DescriptorList_byFd(&running -> descriptors, id);
-
-  //MessageQueue* mq = mq_des -> mq;
-
   MessageQueue* mq = MessageQueueList_byId(&mq_list, id);
-
-  //MessageQueue_print(mq);
 
   if(mq == NULL){
     running -> syscall_retvalue = DSOS_ERESOURCENOFD;
@@ -37,14 +31,12 @@ void internal_MessageQueue_write(){
 
   
   if(mq->num_written == MAX_NUM_MESSAGES){
-    printf("La Message Queue con ID: %ld e' piena, il processo con ID: %d viene sospeso\n", running->syscall_args[0], running->pid);
+    if(DEBUG==1) printf("La Message Queue con ID: %ld e' piena, il processo con ID: %d viene sospeso\n", running->syscall_args[0], running->pid);
 
     running->status=Waiting;
     List_insert(&waiting_list, waiting_list.last, (ListItem*) running);
     List_insert(&mq->waiting_to_write, mq->waiting_to_write.last, (ListItem*) PCBPtr_alloc(running));
-    PCBPtr_alloc(running);
 
-    //disastrOS_printStatus();
     PCB* next_running = (PCB*) List_detach(&ready_list, ready_list.first);
     
     
@@ -57,13 +49,12 @@ void internal_MessageQueue_write(){
 
   List_insert(&mq->messages, mq->messages.last, (ListItem*)message);
 
-  printf("Il processo con ID: %d ha scritto il messaggio '%s' nella Message Queue con ID: %ld\n",
-         running->pid, message->message, running->syscall_args[0]);
+  //printf("Il processo con ID: %d ha scritto il messaggio '%s' nella Message Queue con ID: %ld\n",
+  //       running->pid, message->message, running->syscall_args[0]);
 
   while(mq->waiting_to_read.size > 0){
 
-    printf("Il processo con ID: %d fa ripartire un processo che voleva leggere una Message Queue vuota\n",
-           running->pid);
+    if(DEBUG==1) printf("Il processo con ID: %d fa ripartire un processo che voleva leggere una Message Queue vuota\n", running->pid);
 
         //Caccio il puntatore dallo struct di liste di ptr al PCB che deve leggere
         PCBPtr* reader_ptr = (PCBPtr*)List_detach(&mq->waiting_to_read, mq->waiting_to_read.first);

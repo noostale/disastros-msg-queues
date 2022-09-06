@@ -12,7 +12,7 @@ void internal_openMessageQueue(){
   int id=running->syscall_args[0];
   int open_mode=running->syscall_args[1];
 
-  printf("Il processo con ID: %d sta eseguendo un'operazione di tipo Message Queue\n", running->pid);
+  //printf("Il processo con ID: %d sta eseguendo un'operazione di tipo Message Queue\n", running->pid);
 
   MessageQueue* res=MessageQueueList_byId(&mq_list, id);
 
@@ -22,7 +22,7 @@ void internal_openMessageQueue(){
   // throw an error
   //printf ("CREATING id %d, type: %d, open mode %d\n", id, type, open_mode);
   if (open_mode == DSOS_CREATE){
-    printf("Il processo con ID: %d sta creando una Message Queue\n", running->pid);
+    //printf("Il processo con ID: %d sta creando una Message Queue\n", running->pid);
 
     if (res) {
       running->syscall_retvalue=DSOS_ERESOURCECREATE;
@@ -32,7 +32,7 @@ void internal_openMessageQueue(){
     res=MessageQueue_alloc(id);
     List_insert(&mq_list, mq_list.last, (ListItem*) res);
 
-    printf("Il processo con ID: %d ha terminato di creare la Message Queue con ID: %d\n", running->pid, id);
+    //printf("Il processo con ID: %d ha terminato di creare la Message Queue con ID: %d\n", running->pid, id);
   }
 
   // at this point we should have the resource, if not something was wrong
