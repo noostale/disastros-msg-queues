@@ -1,7 +1,7 @@
 # Message Queues in DisastrOS - Frasca Emanuele 
 
 ## What?
-Il progetto si prefigge di aggiungere una message queue a DisastrOS.
+Il progetto si prefigge di aggiungere una message queue a DisastrOS, un operating system simulator scritto in linguaggio C.
 
 ## How?
 Il progetto è stato reso possibile grazie all'utilizzo di alcune funzioni preimpostate in DisastrOS ed alla creazione di una struttura la quale modella una Message Queue.
