@@ -1,10 +1,11 @@
-# Message Queues in DisastrOS - Frasca Emanuele 
+# Message Queues in DisastrOS
 
-## What?
-Il progetto si prefigge di aggiungere una message queue a DisastrOS, un operating system simulator scritto in linguaggio C.
+## What?  
+The project aims to add a message queue to **DisastrOS**, an operating system simulator written in C.
 
-## How?
-Il progetto è stato reso possibile grazie all'utilizzo di alcune funzioni preimpostate in DisastrOS ed alla creazione di una struttura la quale modella una Message Queue.
+## How?  
+The project was made possible through the use of some predefined functions in **DisastrOS** and the creation of a structure that models a **Message Queue**:
+
 ```C
 typedef struct {
   ListItem list;
@@ -16,7 +17,9 @@ typedef struct {
   ListHead waiting_to_write;
 } MessageQueue;
 ```
- È stata poi creata una struttura accessoria che modella un messaggio 
+
+An auxiliary structure was also created to model a **Message**:
+
 ```C
 typedef struct {
   ListItem list;
@@ -25,7 +28,7 @@ typedef struct {
 } Message;
 ```
 
-Per far gestire al SO queste strutture sono state installate quattro nuove system call le quali permettono di aprire, chiudere, scrivere, leggere e distruggere una Message Queue.
+To allow the OS to manage these structures, four new **system calls** were implemented, enabling opening, closing, writing, reading, and destroying a **Message Queue**:
 
 ```C
 int disastrOS_openMessageQueue(int id, int mode)
@@ -34,12 +37,15 @@ int disastrOS_MessageQueue_write(int id, char* write_buffer, int len)
 int disastrOS_MessageQueue_read(int id, char* buf, int len)
 int disastrOS_MessageQueue_destroy(int id)
 ```
-Ed esse sono state opportunamente aggiunte al System Call Vector.
 
-Infine è stato implementato un sistema di controllo che permette di capire se una Message Queue è piena e qualcuno vuole scrivergli o se una MQ è vuota e qualcuno vuole leggervi mettendo il suddetto processo in waiting list.
+These system calls have been appropriately added to the **System Call Vector**.
 
-## How to run?
-Nel file constants.h è possibile settare il sistema come si preferisce  
-**Comando di compilazione:** make  
-**Comando di esecuzione:** ./disastrOS_test
+Finally, a **control mechanism** has been implemented to handle cases where:
+- A **Message Queue is full** and a process wants to write to it → the process is placed in the **waiting list**.
+- A **Message Queue is empty** and a process wants to read from it → the process is placed in the **waiting list**.
 
+## How to run?  
+In the **constants.h** file, the system can be configured as desired.  
+
+- **Compilation command:** `make`  
+- **Execution command:** `./disastrOS_test`
